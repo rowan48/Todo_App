@@ -1,116 +1,81 @@
 <!DOCTYPE html>
-<html lang="en" dir='ltr'>
-
+<html lang="en">
 <head>
-  <title>TODOLIST</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="shortcut icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/GNOME_Todo_icon_2019.svg/1200px-GNOME_Todo_icon_2019.svg.png" type="image/x-icon">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" integrity="sha512-5A8nwdMOWrSz20fDsjczgUidUBR8liPYU+WymTZP1lmY9G6Oc7HlZv156XqnsgNUzTyMefFTcsFH/tnJE/+xBg==" crossorigin="anonymous" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css">
+
+    <style>
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+        }
+        h1 {
+        	padding-top: 40px;
+        }
+    </style>
 </head>
+<body>
+    <div id="app" class="container">
+        <h1>Todo List</h1>
 
-<body class="text-light bg-dark">
-  <div id="todoapp">
-    <h1>TODO-LIST</h1>
-    <h2>welcome</h2>
-  </div>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+        <div v-if="!isEditing">
+            <input type="text" v-model="todo">
+            <input type="submit" value="Add" @click="storeTodo">
+        </div>
+        <div v-else>
+            <input type="text" v-model="todo">
+            <input type="submit" value="Update" @click="updateTodo">
+        </div>
 
-  <script>
-    var todoapp = new vue({
-      el: '#todoapp',
-      data: {
-        name: 'rowan'
-      }
-    })
-    ar myNodelist = document.getElementsByTagName("LI");
-    var i;
-    for (i = 0; i < myNodelist.length; i++) {
-        var span = document.createElement("SPAN");
-        var txt = document.createTextNode("\u00D7");
-        span.className = "close";
-        span.appendChild(txt);
-        myNodelist[i].appendChild(span);
-}
-
-// Click on a close button to hide the current list item
-var close = document.getElementsByClassName("close");
-var i;
-for (i = 0; i < close.length; i++) {
-  close[i].onclick = function() {
-    var div = this.parentElement;
-    div.style.display = "none";
-  }
-}
-// Add a "checked" symbol when clicking on a list item
-var list = document.querySelector('ul');
-list.addEventListener('click', function(ev) {
-  if (ev.target.tagName === 'LI') {
-    ev.target.classList.toggle('checked');
-  }
-}, false);
-// Create a new list item when clicking on the "Add" button
-function newElement() {
-  var li = document.createElement("li");
-  var inputValue = document.getElementById("myInput").value;
-  var t = document.createTextNode(inputValue);
-  li.appendChild(t);
-  if (inputValue === '') {
-    alert("You must write something!");
-  } else {
-    document.getElementById("myUL").appendChild(li);
-  }
-  document.getElementById("myInput").value = "";
-
-  var span = document.createElement("SPAN");
-  var txt = document.createTextNode("\u00D7");
-  span.className = "close";
-  span.appendChild(txt);
-  li.appendChild(span);
-
-  for (i = 0; i < close.length; i++) {
-    close[i].onclick = function() {
-      var div = this.parentElement;
-      div.style.display = "none";
-    }
-  }
-}
-
-  </script>
-  <form action="">
-    <input type="text"name ="title" placeholder ="Enter Todo...">
-    <br>
-    <!--<span onclick="newElement()" class="addBtn">Add</span>-->
-    
-
-   <input type="checkbox" id="todo1" name="todo1" value="course">
-    <label for="todo1"> Attend a course</label><br>
-    <input type="checkbox" id="todo2" name="todo2" value="medicine">
-    <label for="todo2"> Take medicine</label><br>
-    <input type="checkbox" id="todo3" name="todo3" value="flight">
-    <label for="todo3"> Book my flight</label>
-    <button type="submit">Add</button>
-    <button type="reset">reset</button>
-
-    
-
-
-  <!--</form> 
-  <form action="">
-
-    <div>
-        <label for="title">todoapp</label>
-        <input type="text"name ="title" placeholder ="Enter Todo...">
-        <br>  
-        <button type="submit">Add</button>
+        <ol>
+            <li v-for="(todo, index) in todos">
+                {{ todo }}
+                <button @click="editTodo(index, todo)">Edit</button>
+                <button @click="removeTodo(index)">Delete</button>
+            </li>
+        </ol>
     </div>
-  </form>-->
-  <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> -->
 
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            
+            data: {
+                isEditing: false,
+                todo: '',
+                todos: [],
+                selectedTodo: null
+            },
+            
+            methods: {
+                storeTodo() {
+                    this.todos.push(this.todo)
+                    this.todo = ''
+                },
 
+                removeTodo(index) {
+                    this.todos.splice(index, 1)
+                },
+
+                updateTodo() {
+                    this.todos.splice(this.selectedIndex, 1, this.todo)
+                    this.todo = ''
+                    this.isEditing = false
+                },
+
+                editTodo(index, todo) {
+                    this.isEditing = true
+                    this.todo = todo
+                    this.selectedIndex = index
+                }
+            }
+        })
+    </script>
 </body>
-
 </html>
